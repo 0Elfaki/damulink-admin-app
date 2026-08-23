@@ -94,7 +94,7 @@ class _CampaignsAdminScreenState extends State<CampaignsAdminScreen> {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(14),
-        boxShadow: [BoxShadow(color: AppColors.shadow, blurRadius: 4, offset: const Offset(0, 2))],
+        boxShadow: const [BoxShadow(color: AppColors.shadow, blurRadius: 4, offset: Offset(0, 2))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -110,7 +110,7 @@ class _CampaignsAdminScreenState extends State<CampaignsAdminScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: (isActive ? AppColors.success : AppColors.textSecondary).withOpacity(0.12),
+                  color: (isActive ? AppColors.success : AppColors.textSecondary).withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(

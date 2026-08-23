@@ -23,7 +23,7 @@ class AuthRepository {
     if (!profile.isStaff) {
       // Not an organizer/lab/admin account -- this dashboard isn't for them.
       await _auth.signOut();
-      throw AuthException('This account does not have dashboard access. Contact an admin.');
+      throw const AuthException('This account does not have dashboard access. Contact an admin.');
     }
     return profile;
   }

@@ -1,0 +1,14 @@
+{
+  // Prevent the "Language Support for Java" extension from treating the
+  // Flutter android/ folder as a standalone Gradle/Java project.
+  // This eliminates phantom errors like:
+  //   "A project with the name android already exists"
+  //   "The specified project directory lib/android does not exist"
+  "java.import.gradle.enabled": false,
+  "java.import.exclusions": [
+    "**/android/**",
+    "**/build/**",
+    "**/.dart_tool/**"
+  ],
+  "java.configuration.updateBuildConfiguration": "disabled"
+}

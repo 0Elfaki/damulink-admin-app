@@ -120,7 +120,7 @@ class _BloodRequestsAdminScreenState extends State<BloodRequestsAdminScreen> {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(14),
-        boxShadow: [BoxShadow(color: AppColors.shadow, blurRadius: 4, offset: const Offset(0, 2))],
+        boxShadow: const [BoxShadow(color: AppColors.shadow, blurRadius: 4, offset: Offset(0, 2))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -129,7 +129,7 @@ class _BloodRequestsAdminScreenState extends State<BloodRequestsAdminScreen> {
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
+                decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)),
                 child: Text(request.urgency.toUpperCase(),
                     style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: color)),
               ),

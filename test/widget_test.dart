@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -17,7 +17,6 @@ class MockLocalStorage extends LocalStorage {
   @override
   Future<void> persistSession(String session) async {}
 
-  @override
   Future<void> removeSession() async {}
 
   @override
@@ -45,7 +44,7 @@ void main() {
     // Initialize Supabase with dummy credentials and mock storage for testing
     await Supabase.initialize(
       url: 'https://placeholder.supabase.co',
-      anonKey: 'placeholderAnonKey',
+      publishableKey: 'placeholderAnonKey',
       authOptions: const FlutterAuthClientOptions(
         localStorage: MockLocalStorage(),
         pkceAsyncStorage: MockGotrueAsyncStorage(),

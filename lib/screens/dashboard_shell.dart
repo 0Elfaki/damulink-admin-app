@@ -99,7 +99,7 @@ class _DashboardShellState extends State<DashboardShell> {
                                 ),
                               ),
                               selected: selected,
-                              selectedTileColor: AppColors.primary.withOpacity(0.15),
+                              selectedTileColor: AppColors.primary.withValues(alpha: 0.15),
                             );
                           },
                         ),

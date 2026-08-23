@@ -1,3 +1,5 @@
+rootProject.name = "damulink_admin_android"
+
 pluginManagement {
     val flutterSdkPath =
         run {
