@@ -65,12 +65,24 @@ class _AuthGateState extends State<_AuthGate> {
 
   Future<void> _check() async {
     if (SupabaseService.isLoggedIn) {
-      final profile = await _authRepository.getCurrentStaffProfile();
-      if (mounted) {
-        setState(() {
-          _profile = (profile?.isStaff ?? false) ? profile : null;
-          _isChecking = false;
-        });
+      try {
+        final profile = await _authRepository.getCurrentStaffProfile();
+        if (mounted) {
+          setState(() {
+            _profile = (profile?.isStaff ?? false) ? profile : null;
+            _isChecking = false;
+          });
+        }
+      } catch (_) {
+        // A failed session/token refresh (e.g. no network, expired
+        // session) should never leave the app stuck on the loading
+        // spinner. Fall through to the login screen instead.
+        if (mounted) {
+          setState(() {
+            _profile = null;
+            _isChecking = false;
+          });
+        }
       }
     } else {
       if (mounted) setState(() => _isChecking = false);
