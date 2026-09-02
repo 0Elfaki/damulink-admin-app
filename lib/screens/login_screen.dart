@@ -20,6 +20,47 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
   String? _error;
 
+  Future<void> _forgotPassword() async {
+    final controller = TextEditingController(text: _emailController.text.trim());
+    final email = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Reset Password'),
+        content: TextField(
+          controller: controller,
+          keyboardType: TextInputType.emailAddress,
+          autofocus: true,
+          decoration: const InputDecoration(
+            labelText: 'Email',
+            hintText: 'Enter your staff account email',
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, controller.text.trim()),
+            child: const Text('Send Link'),
+          ),
+        ],
+      ),
+    );
+    if (email == null || email.isEmpty) return;
+
+    try {
+      await _authRepository.sendPasswordResetEmail(email);
+    } catch (_) {
+      // Fall through to the same generic message either way -- don't
+      // reveal whether an account exists for this email.
+    }
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('If an account exists for that email, a reset link is on its way. Open it on this device to continue.'),
+        ),
+      );
+    }
+  }
+
   Future<void> _login() async {
     setState(() {
       _isLoading = true;
@@ -95,6 +136,16 @@ class _LoginScreenState extends State<LoginScreen> {
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   onSubmitted: (_) => _login(),
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: _forgotPassword,
+                    child: const Text(
+                      'Forgot Password?',
+                      style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600),
+                    ),
+                  ),
                 ),
                 if (_error != null) ...[
                   const SizedBox(height: 16),

@@ -1,10 +1,13 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'constants/colors.dart';
 import 'services/supabase_service.dart';
 import 'models/staff_profile.dart';
 import 'services/auth_repository.dart';
 import 'screens/login_screen.dart';
+import 'screens/reset_password_screen.dart';
 import 'screens/dashboard_shell.dart';
 
 void main() async {
@@ -55,12 +58,37 @@ class _AuthGate extends StatefulWidget {
 class _AuthGateState extends State<_AuthGate> {
   final _authRepository = AuthRepository();
   bool _isChecking = true;
+  bool _isPasswordRecovery = false;
   StaffProfile? _profile;
+  late final StreamSubscription<AuthState> _authSub;
 
   @override
   void initState() {
     super.initState();
     _check();
+    // A password-recovery deep link (damulinkadmin://reset-callback?code=...)
+    // lands here as this event once Supabase exchanges the code for a
+    // temporary session -- show the set-new-password screen instead of
+    // whatever _check() would otherwise decide.
+    _authSub = SupabaseService.auth.onAuthStateChange.listen((state) {
+      if (state.event == AuthChangeEvent.passwordRecovery && mounted) {
+        setState(() => _isPasswordRecovery = true);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _authSub.cancel();
+    super.dispose();
+  }
+
+  void _onPasswordResetDone() {
+    setState(() {
+      _isPasswordRecovery = false;
+      _profile = null;
+      _isChecking = false;
+    });
   }
 
   Future<void> _check() async {
@@ -94,6 +122,9 @@ class _AuthGateState extends State<_AuthGate> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isPasswordRecovery) {
+      return ResetPasswordScreen(onDone: _onPasswordResetDone);
+    }
     if (_isChecking) {
       return const Scaffold(
         backgroundColor: AppColors.background,
