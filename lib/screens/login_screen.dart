@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../constants/colors.dart';
+import '../models/staff_profile.dart';
 import '../services/auth_repository.dart';
 
 class LoginScreen extends StatefulWidget {
-  final VoidCallback onSignedIn;
+  final ValueChanged<StaffProfile> onSignedIn;
   const LoginScreen({super.key, required this.onSignedIn});
 
   @override
@@ -25,11 +26,11 @@ class _LoginScreenState extends State<LoginScreen> {
       _error = null;
     });
     try {
-      await _authRepository.signIn(
+      final profile = await _authRepository.signIn(
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
-      widget.onSignedIn();
+      if (profile != null) widget.onSignedIn(profile);
     } on AuthException catch (e) {
       setState(() => _error = e.message);
     } catch (e) {
@@ -126,7 +127,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 16),
                 const Text(
-                  'Access is limited to organizer, lab, and admin accounts.\nDonors should use the DamuLink app instead.',
+                  'Access is limited to health staff, organizer, lab, and admin accounts.\nDonors should use the DamuLink app instead.',
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
                 ),

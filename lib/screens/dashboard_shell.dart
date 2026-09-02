@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
 import '../constants/colors.dart';
+import '../models/staff_profile.dart';
 import '../services/auth_repository.dart';
 import 'dashboard_screen.dart';
 import 'campaigns_admin_screen.dart';
 import 'blood_requests_admin_screen.dart';
 import 'lab_reports_admin_screen.dart';
 import 'users_admin_screen.dart';
+import 'register_donor_screen.dart';
+import 'donors_list_screen.dart';
+import 'staff_kpi_screen.dart';
 
 class DashboardShell extends StatefulWidget {
+  final StaffProfile profile;
   final VoidCallback onSignedOut;
-  const DashboardShell({super.key, required this.onSignedOut});
+  const DashboardShell({super.key, required this.profile, required this.onSignedOut});
 
   @override
   State<DashboardShell> createState() => _DashboardShellState();
@@ -19,7 +24,11 @@ class _DashboardShellState extends State<DashboardShell> {
   int _selectedIndex = 0;
   final _authRepository = AuthRepository();
 
-  static const _destinations = [
+  // health_staff gets a scoped nav -- just donor registration, the donor
+  // list, and their own KPIs. organizer/lab/admin keep the full set.
+  bool get _isHealthStaffOnly => widget.profile.role == 'health_staff';
+
+  static const _fullDestinations = [
     (icon: Icons.dashboard_outlined, selectedIcon: Icons.dashboard, label: 'Dashboard'),
     (icon: Icons.campaign_outlined, selectedIcon: Icons.campaign, label: 'Campaigns'),
     (icon: Icons.bloodtype_outlined, selectedIcon: Icons.bloodtype, label: 'Blood Requests'),
@@ -27,13 +36,30 @@ class _DashboardShellState extends State<DashboardShell> {
     (icon: Icons.people_outline, selectedIcon: Icons.people, label: 'Users'),
   ];
 
-  final _screens = const [
+  static const _staffDestinations = [
+    (icon: Icons.person_add_alt_1_outlined, selectedIcon: Icons.person_add_alt_1, label: 'Register Donor'),
+    (icon: Icons.people_outline, selectedIcon: Icons.people, label: 'Donors'),
+    (icon: Icons.insights_outlined, selectedIcon: Icons.insights, label: 'KPIs'),
+  ];
+
+  static const _fullScreens = [
     DashboardScreen(),
     CampaignsAdminScreen(),
     BloodRequestsAdminScreen(),
     LabReportsAdminScreen(),
     UsersAdminScreen(),
   ];
+
+  static const _staffScreens = [
+    RegisterDonorScreen(),
+    DonorsListScreen(),
+    StaffKpiScreen(),
+  ];
+
+  List<({IconData icon, IconData selectedIcon, String label})> get _destinations =>
+      _isHealthStaffOnly ? _staffDestinations : _fullDestinations;
+
+  List<Widget> get _screens => _isHealthStaffOnly ? _staffScreens : _fullScreens;
 
   Future<void> _signOut() async {
     await _authRepository.signOut();

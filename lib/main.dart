@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'constants/colors.dart';
 import 'services/supabase_service.dart';
+import 'models/staff_profile.dart';
 import 'services/auth_repository.dart';
 import 'screens/login_screen.dart';
 import 'screens/dashboard_shell.dart';
@@ -54,7 +55,7 @@ class _AuthGate extends StatefulWidget {
 class _AuthGateState extends State<_AuthGate> {
   final _authRepository = AuthRepository();
   bool _isChecking = true;
-  bool _isAuthorized = false;
+  StaffProfile? _profile;
 
   @override
   void initState() {
@@ -67,7 +68,7 @@ class _AuthGateState extends State<_AuthGate> {
       final profile = await _authRepository.getCurrentStaffProfile();
       if (mounted) {
         setState(() {
-          _isAuthorized = profile?.isStaff ?? false;
+          _profile = (profile?.isStaff ?? false) ? profile : null;
           _isChecking = false;
         });
       }
@@ -76,8 +77,8 @@ class _AuthGateState extends State<_AuthGate> {
     }
   }
 
-  void _onSignedIn() => setState(() => _isAuthorized = true);
-  void _onSignedOut() => setState(() => _isAuthorized = false);
+  void _onSignedIn(StaffProfile profile) => setState(() => _profile = profile);
+  void _onSignedOut() => setState(() => _profile = null);
 
   @override
   Widget build(BuildContext context) {
@@ -87,8 +88,9 @@ class _AuthGateState extends State<_AuthGate> {
         body: Center(child: CircularProgressIndicator(color: AppColors.primary)),
       );
     }
-    if (_isAuthorized) {
-      return DashboardShell(onSignedOut: _onSignedOut);
+    final profile = _profile;
+    if (profile != null) {
+      return DashboardShell(profile: profile, onSignedOut: _onSignedOut);
     }
     return LoginScreen(onSignedIn: _onSignedIn);
   }

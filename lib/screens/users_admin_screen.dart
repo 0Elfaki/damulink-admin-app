@@ -17,7 +17,7 @@ class _UsersAdminScreenState extends State<UsersAdminScreen> {
   bool _isLoading = true;
   String _searchQuery = '';
 
-  final _roles = ['donor', 'organizer', 'lab', 'admin'];
+  final _roles = ['donor', 'organizer', 'lab', 'admin', 'health_staff'];
 
   @override
   void initState() {
@@ -78,9 +78,16 @@ class _UsersAdminScreenState extends State<UsersAdminScreen> {
         return AppColors.warning;
       case 'lab':
         return AppColors.primaryDark;
+      case 'health_staff':
+        return AppColors.success;
       default:
         return AppColors.textSecondary;
     }
+  }
+
+  String _roleLabel(String role) {
+    if (role == 'health_staff') return 'Health Staff';
+    return role[0].toUpperCase() + role.substring(1);
   }
 
   @override
@@ -169,7 +176,7 @@ class _UsersAdminScreenState extends State<UsersAdminScreen> {
             items: _roles
                 .map((r) => DropdownMenuItem(
                       value: r,
-                      child: Text(r[0].toUpperCase() + r.substring(1)),
+                      child: Text(_roleLabel(r)),
                     ))
                 .toList(),
             onChanged: (newRole) {

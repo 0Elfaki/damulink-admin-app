@@ -1,7 +1,7 @@
 class StaffProfile {
   final String id;
   final String fullName;
-  final String role; // donor | organizer | lab | admin
+  final String role; // donor | organizer | lab | admin | health_staff
   final int points;
   final DateTime createdAt;
 
@@ -13,7 +13,9 @@ class StaffProfile {
     required this.createdAt,
   });
 
-  bool get isStaff => role == 'organizer' || role == 'lab' || role == 'admin';
+  bool get isStaff =>
+      role == 'organizer' || role == 'lab' || role == 'admin' || role == 'health_staff';
+  bool get isHealthStaff => role == 'health_staff';
   bool get isAdmin => role == 'admin';
 
   factory StaffProfile.fromMap(Map<String, dynamic> map) {
