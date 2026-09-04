@@ -44,15 +44,21 @@ class AuthRepository {
     await _auth.signOut();
   }
 
-  /// Sends a password-reset email. The link opens this app directly via a
-  /// custom URL scheme (registered in AndroidManifest.xml) instead of a
-  /// browser, and Supabase fires an AuthChangeEvent.passwordRecovery event
-  /// once the app picks it up -- see main.dart.
+  /// Sends a password-reset email containing a 6-digit code. Make sure
+  /// the "Reset Password" email template in Supabase includes
+  /// {{ .Token }} so the code actually shows up in the email. The code
+  /// is verified in-app with verifyPasswordResetOtp -- no deep link or
+  /// redirect URL needed, so this works even if the email is opened on a
+  /// different device than the one running the app.
   Future<void> sendPasswordResetEmail(String email) async {
-    await _auth.resetPasswordForEmail(
-      email,
-      redirectTo: 'damulinkadmin://reset-callback',
-    );
+    await _auth.resetPasswordForEmail(email);
+  }
+
+  /// Verifies the 6-digit code from the reset email and establishes a
+  /// temporary recovery session, which updatePassword() then uses to set
+  /// the new password.
+  Future<void> verifyPasswordResetOtp({required String email, required String code}) async {
+    await _auth.verifyOTP(type: OtpType.recovery, token: code, email: email);
   }
 
   Future<void> updatePassword(String newPassword) async {

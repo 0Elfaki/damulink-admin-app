@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../constants/colors.dart';
 import '../models/staff_profile.dart';
 import '../services/auth_repository.dart';
+import 'reset_password_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   final ValueChanged<StaffProfile> onSignedIn;
@@ -20,45 +21,8 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
   String? _error;
 
-  Future<void> _forgotPassword() async {
-    final controller = TextEditingController(text: _emailController.text.trim());
-    final email = await showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Reset Password'),
-        content: TextField(
-          controller: controller,
-          keyboardType: TextInputType.emailAddress,
-          autofocus: true,
-          decoration: const InputDecoration(
-            labelText: 'Email',
-            hintText: 'Enter your staff account email',
-          ),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, controller.text.trim()),
-            child: const Text('Send Link'),
-          ),
-        ],
-      ),
-    );
-    if (email == null || email.isEmpty) return;
-
-    try {
-      await _authRepository.sendPasswordResetEmail(email);
-    } catch (_) {
-      // Fall through to the same generic message either way -- don't
-      // reveal whether an account exists for this email.
-    }
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('If an account exists for that email, a reset link is on its way. Open it on this device to continue.'),
-        ),
-      );
-    }
+  void _forgotPassword() {
+    Navigator.push(context, MaterialPageRoute(builder: (_) => const ResetPasswordScreen()));
   }
 
   Future<void> _login() async {
