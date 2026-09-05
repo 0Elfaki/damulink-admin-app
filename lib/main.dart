@@ -25,16 +25,29 @@ class DamuLinkAdminApp extends StatelessWidget {
         primaryColor: AppColors.primary,
         scaffoldBackgroundColor: AppColors.background,
         fontFamily: GoogleFonts.poppins().fontFamily,
+        // Default text color/weight for anything that doesn't set its
+        // own TextStyle (dialog titles, chip labels, etc.), so those
+        // don't fall back to Material's default black87/purple accents.
+        textTheme: GoogleFonts.poppinsTextTheme(ThemeData.light().textTheme).apply(
+          bodyColor: AppColors.textPrimary,
+          displayColor: AppColors.textPrimary,
+        ),
         appBarTheme: const AppBarTheme(
           elevation: 0,
           backgroundColor: AppColors.surface,
           foregroundColor: AppColors.textPrimary,
         ),
+        // Shared default for every TextField/TextFormField that doesn't
+        // override its own border -- keeps the 12px control radius in
+        // one place instead of repeated on every field.
+        inputDecorationTheme: InputDecorationTheme(
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primary,
             foregroundColor: AppColors.white,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
         ),
       ),

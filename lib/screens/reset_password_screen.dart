@@ -156,10 +156,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             TextField(
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Email',
-                prefixIcon: const Icon(Icons.email_outlined),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                prefixIcon: Icon(Icons.email_outlined),
               ),
             ),
           ],
@@ -178,9 +177,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               maxLength: 6,
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 24, letterSpacing: 8, fontWeight: FontWeight.bold),
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 counterText: '',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               ),
             ),
             Align(
@@ -210,17 +208,15 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility),
                   onPressed: () => setState(() => _obscure = !_obscure),
                 ),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               ),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: _confirmPasswordController,
               obscureText: _obscure,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Confirm New Password',
-                prefixIcon: const Icon(Icons.lock_outline),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                prefixIcon: Icon(Icons.lock_outline),
               ),
             ),
           ],

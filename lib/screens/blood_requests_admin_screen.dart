@@ -3,6 +3,11 @@ import 'package:intl/intl.dart';
 import '../constants/colors.dart';
 import '../models/blood_request_admin.dart';
 import '../services/blood_request_admin_repository.dart';
+import '../theme/app_text_styles.dart';
+import '../widgets/app_card.dart';
+import '../widgets/list_state.dart';
+import '../widgets/section_header.dart';
+import '../widgets/status_pill.dart';
 
 class BloodRequestsAdminScreen extends StatefulWidget {
   const BloodRequestsAdminScreen({super.key});
@@ -60,10 +65,7 @@ class _BloodRequestsAdminScreenState extends State<BloodRequestsAdminScreen> {
           physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.all(20),
           children: [
-            const Text(
-              'Blood Requests',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
-            ),
+            const SectionHeader(title: 'Blood Requests'),
             const SizedBox(height: 12),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -78,15 +80,9 @@ class _BloodRequestsAdminScreenState extends State<BloodRequestsAdminScreen> {
             ),
             const SizedBox(height: 16),
             if (_isLoading)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 60),
-                child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
-              )
+              const LoadingState()
             else if (_requests.isEmpty)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 60),
-                child: Center(child: Text('No requests found.', style: TextStyle(color: AppColors.textSecondary))),
-              )
+              const EmptyState(message: 'No requests found.')
             else
               ..._requests.map(_buildRequestCard),
           ],
@@ -114,29 +110,18 @@ class _BloodRequestsAdminScreenState extends State<BloodRequestsAdminScreen> {
 
   Widget _buildRequestCard(BloodRequestAdmin request) {
     final color = _urgencyColor(request.urgency);
-    return Container(
+    return AppCard(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: const [BoxShadow(color: AppColors.shadow, blurRadius: 4, offset: Offset(0, 2))],
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)),
-                child: Text(request.urgency.toUpperCase(),
-                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: color)),
-              ),
+              StatusPill(label: request.urgency, color: color),
               const Spacer(),
               Text(
                 DateFormat.yMMMd().add_jm().format(request.createdAt),
-                style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                style: AppTextStyles.caption,
               ),
             ],
           ),
@@ -148,7 +133,7 @@ class _BloodRequestsAdminScreenState extends State<BloodRequestsAdminScreen> {
           const SizedBox(height: 4),
           Text(
             'Requested by ${request.requesterName ?? 'Unknown'} · ${request.unitsNeeded} unit(s) · ${request.responseCount} offer(s)',
-            style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+            style: AppTextStyles.caption,
           ),
           const SizedBox(height: 12),
           Row(
@@ -166,17 +151,7 @@ class _BloodRequestsAdminScreenState extends State<BloodRequestsAdminScreen> {
                   child: const Text('CANCEL', style: TextStyle(fontSize: 11, color: AppColors.critical)),
                 ),
               ] else
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppColors.background,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    request.status.toUpperCase(),
-                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textSecondary),
-                  ),
-                ),
+                StatusPill(label: request.status, color: AppColors.textSecondary),
             ],
           ),
         ],

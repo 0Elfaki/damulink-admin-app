@@ -4,6 +4,8 @@ import '../models/campaign.dart';
 import '../models/donor.dart';
 import '../services/campaign_admin_repository.dart';
 import '../services/donor_repository.dart';
+import '../widgets/app_card.dart';
+import '../widgets/section_header.dart';
 import 'donor_profile_screen.dart';
 
 /// Lets health staff register a donor who doesn't have a smartphone --
@@ -159,7 +161,7 @@ class _RegisterDonorScreenState extends State<RegisterDonorScreen> {
               Navigator.pop(context);
               _resetForm();
             },
-            child: const Text('Register another'),
+            child: const Text('REGISTER ANOTHER'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -169,7 +171,7 @@ class _RegisterDonorScreenState extends State<RegisterDonorScreen> {
                 MaterialPageRoute(builder: (context) => DonorProfileScreen(donorId: donor.id)),
               );
             },
-            child: const Text('View profile'),
+            child: const Text('VIEW PROFILE'),
           ),
         ],
       ),
@@ -183,23 +185,13 @@ class _RegisterDonorScreenState extends State<RegisterDonorScreen> {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          const Text(
-            'Register Donor',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
-          ),
-          const SizedBox(height: 4),
-          const Text(
-            "For donors without a smartphone -- fill this in on their behalf.",
-            style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+          const SectionHeader(
+            title: 'Register Donor',
+            subtitle: "For donors without a smartphone -- fill this in on their behalf.",
           ),
           const SizedBox(height: 20),
-          Container(
+          AppCard(
             padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(14),
-              boxShadow: const [BoxShadow(color: AppColors.shadow, blurRadius: 4, offset: Offset(0, 2))],
-            ),
             child: Form(
               key: _formKey,
               child: Column(

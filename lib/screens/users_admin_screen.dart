@@ -3,6 +3,9 @@ import '../constants/colors.dart';
 import '../models/staff_profile.dart';
 import '../services/user_admin_repository.dart';
 import '../services/supabase_service.dart';
+import '../widgets/app_card.dart';
+import '../widgets/list_state.dart';
+import '../widgets/section_header.dart';
 
 class UsersAdminScreen extends StatefulWidget {
   const UsersAdminScreen({super.key});
@@ -45,8 +48,8 @@ class _UsersAdminScreenState extends State<UsersAdminScreen> {
           title: const Text('Remove your own admin access?'),
           content: const Text('You will lose access to this dashboard immediately.'),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-            TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Confirm')),
+            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('CANCEL')),
+            TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('CONFIRM')),
           ],
         ),
       );
@@ -100,10 +103,7 @@ class _UsersAdminScreenState extends State<UsersAdminScreen> {
           physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.all(20),
           children: [
-            const Text(
-              'Users',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
-            ),
+            const SectionHeader(title: 'Users'),
             const SizedBox(height: 16),
             TextField(
               decoration: InputDecoration(
@@ -120,15 +120,9 @@ class _UsersAdminScreenState extends State<UsersAdminScreen> {
             ),
             const SizedBox(height: 16),
             if (_isLoading)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 60),
-                child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
-              )
+              const LoadingState()
             else if (_users.isEmpty)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 60),
-                child: Center(child: Text('No users found.', style: TextStyle(color: AppColors.textSecondary))),
-              )
+              const EmptyState(message: 'No users found.')
             else
               ..._users.map(_buildUserCard),
           ],
@@ -139,14 +133,9 @@ class _UsersAdminScreenState extends State<UsersAdminScreen> {
 
   Widget _buildUserCard(StaffProfile user) {
     final color = _roleColor(user.role);
-    return Container(
+    return AppCard(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: const [BoxShadow(color: AppColors.shadow, blurRadius: 4, offset: Offset(0, 2))],
-      ),
       child: Row(
         children: [
           Container(

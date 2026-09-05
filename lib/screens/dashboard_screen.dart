@@ -3,6 +3,10 @@ import 'package:fl_chart/fl_chart.dart';
 import '../constants/colors.dart';
 import '../models/dashboard_kpis.dart';
 import '../services/kpi_repository.dart';
+import '../theme/app_text_styles.dart';
+import '../widgets/app_card.dart';
+import '../widgets/section_header.dart';
+import '../widgets/stat_card.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -50,7 +54,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           children: [
             Text(_error!, style: const TextStyle(color: AppColors.textSecondary)),
             const SizedBox(height: 12),
-            ElevatedButton(onPressed: _load, child: const Text('Retry')),
+            ElevatedButton(onPressed: _load, child: const Text('RETRY')),
           ],
         ),
       );
@@ -79,14 +83,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Overview',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
-            ),
-            const SizedBox(height: 4),
-            const Text(
-              'Live numbers across the whole DamuLink platform.',
-              style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+            const SectionHeader(
+              title: 'Overview',
+              subtitle: 'Live numbers across the whole DamuLink platform.',
             ),
             const SizedBox(height: 20),
             LayoutBuilder(
@@ -99,25 +98,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   crossAxisSpacing: 14,
                   mainAxisSpacing: 14,
                   childAspectRatio: 1.5,
-                  children: cards.map((c) => _buildKpiCard(c.label, c.value, c.icon, c.color)).toList(),
+                  children: cards
+                      .map((c) => StatCard(label: c.label, value: c.value, icon: c.icon, color: c.color))
+                      .toList(),
                 );
               },
             ),
             const SizedBox(height: 28),
-            const Text(
-              'Status Breakdown',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
-            ),
+            const Text('Status Breakdown', style: AppTextStyles.sectionTitle),
             const SizedBox(height: 12),
-            Container(
+            SizedBox(
               height: 260,
-              padding: const EdgeInsets.fromLTRB(8, 20, 20, 8),
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: const [BoxShadow(color: AppColors.shadow, blurRadius: 6, offset: Offset(0, 2))],
+              child: AppCard(
+                padding: const EdgeInsets.fromLTRB(8, 20, 20, 8),
+                child: _buildBarChart(kpis),
               ),
-              child: _buildBarChart(kpis),
             ),
           ],
         ),
@@ -178,39 +173,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ],
           );
         }),
-      ),
-    );
-  }
-
-  Widget _buildKpiCard(String label, String value, IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: const [BoxShadow(color: AppColors.shadow, blurRadius: 6, offset: Offset(0, 2))],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)),
-            child: Icon(icon, color: color, size: 20),
-          ),
-          const Spacer(),
-          Text(
-            value,
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: color),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
       ),
     );
   }

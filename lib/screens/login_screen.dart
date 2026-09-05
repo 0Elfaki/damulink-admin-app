@@ -21,6 +21,17 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
   String? _error;
 
+  // Every role this dashboard serves. 'donor' is deliberately excluded --
+  // that account type is rejected by AuthRepository.signIn before it
+  // ever gets here.
+  static const _roles = ['admin', 'organizer', 'lab', 'health_staff'];
+  String _selectedRole = _roles.first;
+
+  String _roleLabel(String role) {
+    if (role == 'health_staff') return 'Health Staff';
+    return role[0].toUpperCase() + role.substring(1);
+  }
+
   void _forgotPassword() {
     Navigator.push(context, MaterialPageRoute(builder: (_) => const ResetPasswordScreen()));
   }
@@ -35,7 +46,24 @@ class _LoginScreenState extends State<LoginScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
-      if (profile != null) widget.onSignedIn(profile);
+      if (profile == null) return;
+
+      // The role picker is a UX guardrail, not the source of truth --
+      // the account's real role always wins. If they don't match, tell
+      // the person clearly instead of silently dropping them into a
+      // dashboard that doesn't match what they expected to see.
+      if (profile.role != _selectedRole) {
+        await _authRepository.signOut();
+        if (mounted) {
+          setState(() {
+            _error = "This account is registered as ${_roleLabel(profile.role)}. "
+                "Select that role above and sign in again.";
+          });
+        }
+        return;
+      }
+
+      widget.onSignedIn(profile);
     } on AuthException catch (e) {
       setState(() => _error = e.message);
     } catch (e) {
@@ -76,14 +104,44 @@ class _LoginScreenState extends State<LoginScreen> {
                   'Organization & staff dashboard',
                   style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 28),
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "I'M SIGNING IN AS",
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textSecondary,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: _roles.map((role) {
+                    final isSelected = _selectedRole == role;
+                    return ChoiceChip(
+                      label: Text(_roleLabel(role)),
+                      selected: isSelected,
+                      onSelected: (_) => setState(() {
+                        _selectedRole = role;
+                        _error = null;
+                      }),
+                      selectedColor: AppColors.primary,
+                      labelStyle: TextStyle(color: isSelected ? AppColors.white : AppColors.textPrimary),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 24),
                 TextField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Email',
-                    prefixIcon: const Icon(Icons.email_outlined),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    prefixIcon: Icon(Icons.email_outlined),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -97,7 +155,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
                       onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                     ),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   onSubmitted: (_) => _login(),
                 ),

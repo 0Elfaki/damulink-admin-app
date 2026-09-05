@@ -4,6 +4,9 @@ import '../constants/colors.dart';
 import '../models/lab_report_admin.dart';
 import '../models/staff_profile.dart';
 import '../services/lab_report_admin_repository.dart';
+import '../widgets/app_card.dart';
+import '../widgets/list_state.dart';
+import '../widgets/section_header.dart';
 
 class LabReportsAdminScreen extends StatefulWidget {
   const LabReportsAdminScreen({super.key});
@@ -57,21 +60,12 @@ class _LabReportsAdminScreenState extends State<LabReportsAdminScreen> {
           physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 90),
           children: [
-            const Text(
-              'Lab Reports',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
-            ),
+            const SectionHeader(title: 'Lab Reports'),
             const SizedBox(height: 16),
             if (_isLoading)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 60),
-                child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
-              )
+              const LoadingState()
             else if (_reports.isEmpty)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 60),
-                child: Center(child: Text('No lab reports yet.', style: TextStyle(color: AppColors.textSecondary))),
-              )
+              const EmptyState(message: 'No lab reports yet.')
             else
               ..._reports.map(_buildReportCard),
           ],
@@ -81,14 +75,8 @@ class _LabReportsAdminScreenState extends State<LabReportsAdminScreen> {
   }
 
   Widget _buildReportCard(LabReportAdmin report) {
-    return Container(
+    return AppCard(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: const [BoxShadow(color: AppColors.shadow, blurRadius: 4, offset: Offset(0, 2))],
-      ),
       child: Row(
         children: [
           Container(
@@ -255,12 +243,12 @@ class _LabReportFormDialogState extends State<_LabReportFormDialog> {
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+        TextButton(onPressed: () => Navigator.pop(context), child: const Text('CANCEL')),
         ElevatedButton(
           onPressed: _isSubmitting ? null : _submit,
           child: _isSubmitting
               ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(color: AppColors.white, strokeWidth: 2))
-              : const Text('Save'),
+              : const Text('SAVE'),
         ),
       ],
     );

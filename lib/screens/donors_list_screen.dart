@@ -3,6 +3,9 @@ import 'package:intl/intl.dart';
 import '../constants/colors.dart';
 import '../models/donor_list_item.dart';
 import '../services/donor_repository.dart';
+import '../widgets/app_card.dart';
+import '../widgets/list_state.dart';
+import '../widgets/section_header.dart';
 import 'donor_profile_screen.dart';
 import 'register_donor_screen.dart';
 
@@ -74,7 +77,7 @@ class _DonorsListScreenState extends State<DonorsListScreen> {
           physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 90),
           children: [
-            const Text('Donors', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
+            const SectionHeader(title: 'Donors'),
             const SizedBox(height: 16),
             TextField(
               decoration: InputDecoration(
@@ -104,15 +107,9 @@ class _DonorsListScreenState extends State<DonorsListScreen> {
             ),
             const SizedBox(height: 12),
             if (_isLoading)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 60),
-                child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
-              )
+              const LoadingState()
             else if (donors.isEmpty)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 60),
-                child: Center(child: Text('No donors found.', style: TextStyle(color: AppColors.textSecondary))),
-              )
+              const EmptyState(message: 'No donors found.')
             else
               ...donors.map(_buildDonorCard),
           ],
@@ -125,16 +122,11 @@ class _DonorsListScreenState extends State<DonorsListScreen> {
     final eligibilityColor = donor.isEligible ? AppColors.success : AppColors.critical;
     return InkWell(
       onTap: () => _openDonor(donor),
-      borderRadius: BorderRadius.circular(14),
-      child: Container(
+      borderRadius: AppCard.radius,
+      child: AppCard(
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(14),
-          border: Border(left: BorderSide(color: eligibilityColor, width: 4)),
-          boxShadow: const [BoxShadow(color: AppColors.shadow, blurRadius: 4, offset: Offset(0, 2))],
-        ),
+        border: Border(left: BorderSide(color: eligibilityColor, width: 4)),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

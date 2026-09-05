@@ -3,6 +3,11 @@ import 'package:intl/intl.dart';
 import '../constants/colors.dart';
 import '../models/campaign.dart';
 import '../services/campaign_admin_repository.dart';
+import '../theme/app_text_styles.dart';
+import '../widgets/app_card.dart';
+import '../widgets/list_state.dart';
+import '../widgets/section_header.dart';
+import '../widgets/status_pill.dart';
 
 class CampaignsAdminScreen extends StatefulWidget {
   const CampaignsAdminScreen({super.key});
@@ -59,21 +64,15 @@ class _CampaignsAdminScreenState extends State<CampaignsAdminScreen> {
       body: RefreshIndicator(
         onRefresh: _load,
         child: _isLoading
-            ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+            ? const LoadingState()
             : ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 90),
                 children: [
-                  const Text(
-                    'Campaigns',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
-                  ),
+                  const SectionHeader(title: 'Campaigns'),
                   const SizedBox(height: 16),
                   if (_campaigns.isEmpty)
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 60),
-                      child: Center(child: Text('No campaigns yet.', style: TextStyle(color: AppColors.textSecondary))),
-                    )
+                    const EmptyState(message: 'No campaigns yet.')
                   else
                     ..._campaigns.map(_buildCampaignCard),
                 ],
@@ -88,45 +87,25 @@ class _CampaignsAdminScreenState extends State<CampaignsAdminScreen> {
         ? (campaign.participantCount / campaign.targetDonations).clamp(0.0, 1.0)
         : 0.0;
 
-    return Container(
+    return AppCard(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: const [BoxShadow(color: AppColors.shadow, blurRadius: 4, offset: Offset(0, 2))],
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               Expanded(
-                child: Text(
-                  campaign.title,
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
-                ),
+                child: Text(campaign.title, style: AppTextStyles.bodyBold),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: (isActive ? AppColors.success : AppColors.textSecondary).withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  campaign.status.toUpperCase(),
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: isActive ? AppColors.success : AppColors.textSecondary,
-                  ),
-                ),
+              StatusPill(
+                label: campaign.status,
+                color: isActive ? AppColors.success : AppColors.textSecondary,
               ),
             ],
           ),
           if (campaign.location.isNotEmpty) ...[
             const SizedBox(height: 4),
-            Text(campaign.location, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+            Text(campaign.location, style: AppTextStyles.caption),
           ],
           const SizedBox(height: 8),
           if (campaign.targetDonations > 0) ...[
@@ -143,7 +122,7 @@ class _CampaignsAdminScreenState extends State<CampaignsAdminScreen> {
           ],
           Text(
             '${campaign.participantCount} / ${campaign.targetDonations} participants · started ${DateFormat.yMMMd().format(campaign.startDate)}',
-            style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+            style: AppTextStyles.caption,
           ),
           const SizedBox(height: 12),
           Row(
@@ -245,12 +224,12 @@ class _CampaignFormDialogState extends State<_CampaignFormDialog> {
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+        TextButton(onPressed: () => Navigator.pop(context), child: const Text('CANCEL')),
         ElevatedButton(
           onPressed: _isSubmitting ? null : _submit,
           child: _isSubmitting
               ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(color: AppColors.white, strokeWidth: 2))
-              : const Text('Create'),
+              : const Text('CREATE'),
         ),
       ],
     );

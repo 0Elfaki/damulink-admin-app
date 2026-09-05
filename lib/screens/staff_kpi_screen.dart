@@ -3,6 +3,10 @@ import 'package:fl_chart/fl_chart.dart';
 import '../constants/colors.dart';
 import '../models/staff_kpis.dart';
 import '../services/staff_kpi_repository.dart';
+import '../theme/app_text_styles.dart';
+import '../widgets/app_card.dart';
+import '../widgets/section_header.dart';
+import '../widgets/stat_card.dart';
 
 class StaffKpiScreen extends StatefulWidget {
   const StaffKpiScreen({super.key});
@@ -50,7 +54,7 @@ class _StaffKpiScreenState extends State<StaffKpiScreen> {
           children: [
             Text(_error!, style: const TextStyle(color: AppColors.textSecondary)),
             const SizedBox(height: 12),
-            ElevatedButton(onPressed: _load, child: const Text('Retry')),
+            ElevatedButton(onPressed: _load, child: const Text('RETRY')),
           ],
         ),
       );
@@ -78,11 +82,9 @@ class _StaffKpiScreenState extends State<StaffKpiScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Staff Overview', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
-            const SizedBox(height: 4),
-            const Text(
-              'Donor registrations and eligibility across the whole donor base.',
-              style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+            const SectionHeader(
+              title: 'Staff Overview',
+              subtitle: 'Donor registrations and eligibility across the whole donor base.',
             ),
             const SizedBox(height: 20),
             LayoutBuilder(
@@ -95,22 +97,21 @@ class _StaffKpiScreenState extends State<StaffKpiScreen> {
                   crossAxisSpacing: 14,
                   mainAxisSpacing: 14,
                   childAspectRatio: 1.5,
-                  children: cards.map((c) => _buildKpiCard(c.label, c.value, c.icon, c.color)).toList(),
+                  children: cards
+                      .map((c) => StatCard(label: c.label, value: c.value, icon: c.icon, color: c.color))
+                      .toList(),
                 );
               },
             ),
             const SizedBox(height: 28),
-            const Text('Eligibility Split', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
+            const Text('Eligibility Split', style: AppTextStyles.sectionTitle),
             const SizedBox(height: 12),
-            Container(
+            SizedBox(
               height: 220,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: const [BoxShadow(color: AppColors.shadow, blurRadius: 6, offset: Offset(0, 2))],
+              child: AppCard(
+                padding: const EdgeInsets.all(20),
+                child: _buildEligibilityChart(kpis),
               ),
-              child: _buildEligibilityChart(kpis),
             ),
           ],
         ),
@@ -175,31 +176,6 @@ class _StaffKpiScreenState extends State<StaffKpiScreen> {
         Expanded(child: Text(label, style: const TextStyle(fontSize: 13, color: AppColors.textPrimary))),
         Text('$value', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: color)),
       ],
-    );
-  }
-
-  Widget _buildKpiCard(String label, String value, IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: const [BoxShadow(color: AppColors.shadow, blurRadius: 6, offset: Offset(0, 2))],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)),
-            child: Icon(icon, color: color, size: 20),
-          ),
-          const Spacer(),
-          Text(value, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: color)),
-          const SizedBox(height: 2),
-          Text(label, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary), maxLines: 2, overflow: TextOverflow.ellipsis),
-        ],
-      ),
     );
   }
 }

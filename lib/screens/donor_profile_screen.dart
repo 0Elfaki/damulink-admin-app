@@ -5,6 +5,8 @@ import '../models/donor.dart';
 import '../models/donor_donation.dart';
 import '../models/donor_list_item.dart';
 import '../services/donor_repository.dart';
+import '../widgets/app_card.dart';
+import '../widgets/status_pill.dart';
 
 /// Full profile for one donor. Walk-in donors (registered by staff) are
 /// editable here -- health status and donation history. App-registered
@@ -97,8 +99,8 @@ class _DonorProfileScreenState extends State<DonorProfileScreen> {
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-            ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Text('Save')),
+            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('CANCEL')),
+            ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Text('SAVE')),
           ],
         ),
       ),
@@ -146,8 +148,8 @@ class _DonorProfileScreenState extends State<DonorProfileScreen> {
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-            ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Text('Log')),
+            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('CANCEL')),
+            ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Text('LOG')),
           ],
         ),
       ),
@@ -212,13 +214,7 @@ class _DonorProfileScreenState extends State<DonorProfileScreen> {
               _field('Location', donor.registrationLocation),
             ]),
             const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: const [BoxShadow(color: AppColors.shadow, blurRadius: 4, offset: Offset(0, 2))],
-              ),
+            AppCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -227,12 +223,15 @@ class _DonorProfileScreenState extends State<DonorProfileScreen> {
                       const Expanded(
                         child: Text('Health status', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
                       ),
-                      TextButton(onPressed: _editHealthStatus, child: const Text('Edit')),
+                      TextButton(onPressed: _editHealthStatus, child: const Text('EDIT')),
                     ],
                   ),
                   Row(
                     children: [
-                      _StatusChip(label: donor.healthStatus == 'eligible' ? 'Eligible' : 'Deferred', isPositive: donor.healthStatus == 'eligible'),
+                      StatusPill(
+                        label: donor.healthStatus == 'eligible' ? 'Eligible' : 'Deferred',
+                        color: donor.healthStatus == 'eligible' ? AppColors.success : AppColors.critical,
+                      ),
                     ],
                   ),
                   if (donor.healthNotes != null && donor.healthNotes!.isNotEmpty) ...[
@@ -243,13 +242,7 @@ class _DonorProfileScreenState extends State<DonorProfileScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: const [BoxShadow(color: AppColors.shadow, blurRadius: 4, offset: Offset(0, 2))],
-              ),
+            AppCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -261,7 +254,7 @@ class _DonorProfileScreenState extends State<DonorProfileScreen> {
                       ElevatedButton.icon(
                         onPressed: _logDonation,
                         icon: const Icon(Icons.add, size: 16),
-                        label: const Text('Log donation'),
+                        label: const Text('LOG DONATION'),
                       ),
                     ],
                   ),
@@ -394,13 +387,7 @@ class _DonorProfileScreenState extends State<DonorProfileScreen> {
   }
 
   Widget _buildCard(String title, List<Widget> fields) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: const [BoxShadow(color: AppColors.shadow, blurRadius: 4, offset: Offset(0, 2))],
-      ),
+    return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -425,18 +412,3 @@ class _DonorProfileScreenState extends State<DonorProfileScreen> {
   }
 }
 
-class _StatusChip extends StatelessWidget {
-  final String label;
-  final bool isPositive;
-  const _StatusChip({required this.label, required this.isPositive});
-
-  @override
-  Widget build(BuildContext context) {
-    final color = isPositive ? AppColors.success : AppColors.critical;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)),
-      child: Text(label, style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12)),
-    );
-  }
-}
